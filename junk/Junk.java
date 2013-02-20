@@ -3,18 +3,8 @@ package junk;
 import java.util.Scanner;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.FixtureDef;
-import org.jbox2d.dynamics.World;
-import org.newdawn.slick.AppGameContainer;
-import org.newdawn.slick.BasicGame;
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.SlickException;
+import org.jbox2d.dynamics.*;
+import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Vector2f;
 
 public class Junk extends BasicGame
@@ -70,134 +60,136 @@ public class Junk extends BasicGame
         camera.setPosition(new Vector2f(0.f, 50.f));
         world = new World(new Vec2(0f, -9.81f), true);
         
-      { // Floor
-        PolygonShape sd = new PolygonShape();
-        sd.setAsEdge(new Vec2(-50f, 0f), new Vec2(50f, 0f));
-        FixtureDef fd = new FixtureDef();
-        fd.shape = sd;
-        fd.density = 0f;
-        fd.friction = 0.3f;
+        { // Floor
+            PolygonShape sd = new PolygonShape();
+            sd.setAsEdge(new Vec2(-50f, 0f), new Vec2(50f, 0f));
+            FixtureDef fd = new FixtureDef();
+            fd.shape = sd;
+            fd.density = 0f;
+            fd.friction = 0.3f;
 
-        BodyDef bd = new BodyDef();
-        bd.position = new Vec2(0.0f, 0.0f);
-        bd.type = BodyType.STATIC;
-        Body b = world.createBody(bd);
-        Fixture f = b.createFixture(fd);
-        FixtureData fda = new FixtureData();
-        fda.setFixture(f);
-        
-        sd = new PolygonShape();
-        sd.setAsEdge(new Vec2(-50f, 0f), new Vec2(-50f, 100f));
-        fd.shape = sd;
-        f = b.createFixture(fd);
-        fda = new FixtureData();
-        fda.setFixture(f);
-        
-        sd = new PolygonShape();
-        sd.setAsEdge(new Vec2(-50f, 100f), new Vec2(50f, 100f));
-        fd.shape = sd;
-        f = b.createFixture(fd);
-        fda = new FixtureData();
-        fda.setFixture(f);
-        
-        sd = new PolygonShape();
-        sd.setAsEdge(new Vec2(50f, 100f), new Vec2(50f, 0f));
-        fd.shape = sd;
-        f = b.createFixture(fd);
-        fda = new FixtureData();
-        fda.setFixture(f);
-      }
+            BodyDef bd = new BodyDef();
+            bd.position = new Vec2(0.0f, 0.0f);
+            bd.type = BodyType.STATIC;
+            Body b = world.createBody(bd);
+            Fixture f = b.createFixture(fd);
+            FixtureData fda = new FixtureData();
+            fda.setFixture(f);
 
-      {
-        // Make bullet
-        PolygonShape sd = new PolygonShape();
-        sd.setAsBox(bsize, bsize);
-        FixtureDef fd = new FixtureDef();
-        fd.density = bdensity;
-        BodyDef bd = new BodyDef();
-        bd.type = BodyType.DYNAMIC;
-        fd.shape = sd;
-        fd.friction = bfriction;
-        fd.restitution = brestitution;
-        bd.bullet = true;
-        // bd.addShape(sd);
-        bd.position = new Vec2(30f, 50f);
-        Body b = world.createBody(bd);
-        Fixture f = b.createFixture(fd);
-        FixtureData fda = new FixtureData();
-        fda.setFixture(f);
-        f.setUserData(fda);
-        b.setLinearVelocity(new Vec2(-25f, -25f));
-        b.setAngularVelocity(6.7f);
+            sd = new PolygonShape();
+            sd.setAsEdge(new Vec2(-50f, 0f), new Vec2(-50f, 100f));
+            fd.shape = sd;
+            f = b.createFixture(fd);
+            fda = new FixtureData();
+            fda.setFixture(f);
 
-        fd.density = bdensity;
-        bd.position = new Vec2(-30f, 25f);
-        b = world.createBody(bd);
-        f = b.createFixture(fd);
-        fda = new FixtureData();
-        fda.setFixture(f);
-        f.setUserData(fda);
-        b.setLinearVelocity(new Vec2(35f, -10f));
-        b.setAngularVelocity(-8.3f);
-      }
+            sd = new PolygonShape();
+            sd.setAsEdge(new Vec2(-50f, 100f), new Vec2(50f, 100f));
+            fd.shape = sd;
+            f = b.createFixture(fd);
+            fda = new FixtureData();
+            fda.setFixture(f);
 
-      {
-        float currX;
-        // Make base
-        for (int i = 0; i < baseCount; ++i) {
-          currX = i * 1.5f * dheight - (1.5f * dheight * baseCount / 2f);
-          makeDomino(currX, dheight / 2.0f, false, world);
-          makeDomino(currX, dheight + dwidth / 2.0f, true, world);
+            sd = new PolygonShape();
+            sd.setAsEdge(new Vec2(50f, 100f), new Vec2(50f, 0f));
+            fd.shape = sd;
+            f = b.createFixture(fd);
+            fda = new FixtureData();
+            fda.setFixture(f);
         }
-        currX = baseCount * 1.5f * dheight - (1.5f * dheight * baseCount / 2f);
-        // Make 'I's
-        for (int j = 1; j < baseCount; ++j) {
-          if (j > 3)
-            ddensity *= .8f;
-          float currY = dheight * .5f + (dheight + 2f * dwidth) * .99f * j; // y at center of 'I'
-                                                                            // structure
 
-          for (int i = 0; i < baseCount - j; ++i) {
-            currX = i * 1.5f * dheight - (1.5f * dheight * (baseCount - j) / 2f);// +
-                                                                                 // parent.random(-.05f,
-                                                                                 // .05f);
-            ddensity *= 2.5f;
-            if (i == 0) {
-              makeDomino(currX - (1.25f * dheight) + .5f * dwidth, currY - dwidth, false, world);
-            }
-            if (i == baseCount - j - 1) {
-              // if (j != 1) //djm: why is this here? it makes it off balance
-              makeDomino(currX + (1.25f * dheight) - .5f * dwidth, currY - dwidth, false, world);
-            }
-            ddensity /= 2.5f;
-            makeDomino(currX, currY, false, world);
-            makeDomino(currX, currY + .5f * (dwidth + dheight), true, world);
-            makeDomino(currX, currY - .5f * (dwidth + dheight), true, world);
-          }
+        {
+            // Make bullet
+            PolygonShape sd = new PolygonShape();
+            sd.setAsBox(bsize, bsize);
+            FixtureDef fd = new FixtureDef();
+            fd.density = bdensity;
+            BodyDef bd = new BodyDef();
+            bd.type = BodyType.DYNAMIC;
+            fd.shape = sd;
+            fd.friction = bfriction;
+            fd.restitution = brestitution;
+            bd.bullet = true;
+            // bd.addShape(sd);
+            bd.position = new Vec2(30f, 50f);
+            Body b = world.createBody(bd);
+            Fixture f = b.createFixture(fd);
+            FixtureData fda = new FixtureData();
+            fda.setFixture(f);
+            f.setUserData(fda);
+            b.setLinearVelocity(new Vec2(-25f, -25f));
+            b.setAngularVelocity(6.7f);
+
+            fd.density = bdensity;
+            bd.position = new Vec2(-30f, 25f);
+            b = world.createBody(bd);
+            f = b.createFixture(fd);
+            fda = new FixtureData();
+            fda.setFixture(f);
+            f.setUserData(fda);
+            b.setLinearVelocity(new Vec2(35f, -10f));
+            b.setAngularVelocity(-8.3f);
         }
-      }
+
+        {
+            float currX;
+            // Make base
+            for (int i = 0; i < baseCount; ++i) {
+                currX = i * 1.5f * dheight - (1.5f * dheight * baseCount / 2f);
+                makeDomino(currX, dheight / 2.0f, false, world);
+                makeDomino(currX, dheight + dwidth / 2.0f, true, world);
+            }
+            //this line is never used FYI
+            //currX = baseCount * 1.5f * dheight - (1.5f * dheight * baseCount / 2f);
+            
+            // Make 'I's
+            for (int j = 1; j < baseCount; ++j) {
+                if (j > 3)
+                    ddensity *= .8f;
+                float currY = dheight * .5f + (dheight + 2f * dwidth) * .99f * j; // y at center of 'I'
+                                                                                // structure
+
+                for (int i = 0; i < baseCount - j; ++i) {
+                    currX = i * 1.5f * dheight - (1.5f * dheight * (baseCount - j) / 2f);// +
+                                                                                    // parent.random(-.05f,
+                                                                                    // .05f);
+                    ddensity *= 2.5f;
+                    if (i == 0) {
+                        makeDomino(currX - (1.25f * dheight) + .5f * dwidth, currY - dwidth, false, world);
+                    }
+                    if (i == baseCount - j - 1) {
+                        // if (j != 1) //djm: why is this here? it makes it off balance
+                        makeDomino(currX + (1.25f * dheight) - .5f * dwidth, currY - dwidth, false, world);
+                    }
+                    ddensity /= 2.5f;
+                    makeDomino(currX, currY, false, world);
+                    makeDomino(currX, currY + .5f * (dwidth + dheight), true, world);
+                    makeDomino(currX, currY - .5f * (dwidth + dheight), true, world);
+                }
+            }
+        }
       
-      {
-          BodyDef bd = new BodyDef();
-          bd.position = new Vec2(0f, 60f);
-          bd.type = BodyType.DYNAMIC;
-          Body b = world.createBody(bd);
-          PolygonShape ps = new PolygonShape();
-          Vec2[] verts = 
-          {
-              new Vec2(0f, 0f),
-              new Vec2(-1f, -1f),
-              new Vec2(-2f, -3f),
-              new Vec2(2f, -10f),
-              new Vec2(3f, -1f)
-          };
-          ps.set(verts, 5);
-          Fixture f = b.createFixture(ps, 50f);
-          FixtureData data = new FixtureData();
-          data.setFixture(f);
-          b.setAngularVelocity(30f);
-          b.setLinearVelocity(new Vec2(0f, -60f));
-      }
+        {
+            BodyDef bd = new BodyDef();
+            bd.position = new Vec2(0f, 60f);
+            bd.type = BodyType.DYNAMIC;
+            Body b = world.createBody(bd);
+            PolygonShape ps = new PolygonShape();
+            Vec2[] verts = 
+            {
+                new Vec2(0f, 0f),
+                new Vec2(-1f, -1f),
+                new Vec2(-2f, -3f),
+                new Vec2(2f, -10f),
+                new Vec2(3f, -1f)
+            };
+            ps.set(verts, 5);
+            Fixture f = b.createFixture(ps, 50f);
+            FixtureData data = new FixtureData();
+            data.setFixture(f);
+            b.setAngularVelocity(30f);
+            b.setLinearVelocity(new Vec2(0f, -60f));
+        }
     }
 
     @Override
